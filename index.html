@@ -146,6 +146,30 @@
     .top-actions .right-btns{display:flex;gap:10px}
     
     .file-info-text{display:block;margin:10px 0;color:#666;font-size:14px;text-align:center}
+
+    /* Email Verification Box */
+    .verification-box{background:#e0f2fe;border:2px solid #0284c7;padding:18px;border-radius:10px;margin:18px 0}
+    .verification-box h3{color:#0c4a6e;margin-bottom:8px}
+    .verification-box p{margin:6px 0;color:#0c4a6e;font-size:14px}
+    .verify-input-row{display:flex;gap:10px;margin-top:12px}
+    .verify-input-row input{flex:1;padding:10px;border:1px solid #7dd3fc;border-radius:6px;font-size:16px;letter-spacing:4px;text-align:center}
+    .verify-input-row button{padding:10px 18px;background:#0284c7;color:#fff;border:0;border-radius:6px;cursor:pointer;font-size:14px;white-space:nowrap}
+    .verify-input-row button:hover{background:#0369a1}
+    .resend-link{color:#0284c7;cursor:pointer;font-size:13px;text-decoration:underline;margin-top:8px;display:inline-block}
+    .resend-link:hover{color:#0369a1}
+    .forgot-link{color:#2b6cb0;cursor:pointer;font-size:13px;text-decoration:underline;margin-top:4px;display:inline-block}
+    .forgot-link:hover{color:#1e4d7a}
+    .forgot-box{background:#f0fdf4;border:1px solid #86efac;padding:16px;border-radius:8px;margin:12px 0}
+    .forgot-box p{color:#166534;font-size:14px;margin:5px 0}
+    .forgot-input-row{display:flex;gap:10px;margin-top:10px}
+    .forgot-input-row input{flex:1;padding:10px;border:1px solid #86efac;border-radius:6px;font-size:16px;letter-spacing:3px;text-align:center}
+    .forgot-input-row button{padding:10px 16px;background:#16a34a;color:#fff;border:0;border-radius:6px;cursor:pointer;font-size:14px;white-space:nowrap}
+    .forgot-input-row button:hover{background:#15803d}
+    .new-pass-row{margin-top:12px}
+    .new-pass-row input{width:100%;padding:10px;border:1px solid #86efac;border-radius:6px;font-size:14px;margin-top:6px}
+    .history-header-btn{background:#8b5cf6;color:#fff;border:0;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px}
+    .history-header-btn:hover{background:#7c3aed}
+    .modal-content{max-height:90vh;overflow-y:auto}
   </style>
 </head>
 <body>
@@ -179,25 +203,118 @@
   <div class="modal" id="authModal">
     <div class="modal-content">
       <h2 id="authTitle">Login</h2>
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="authUsername" placeholder="Enter username" />
+
+      <!-- LOGIN SCREEN -->
+      <div id="screenLogin">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="authUsername" placeholder="Enter username" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" placeholder="Enter password" />
+        </div>
+        <a class="forgot-link" onclick="showScreen('forgot')">🔑 Forgot Password?</a>
+        <div class="form-buttons" style="margin-top:18px">
+          <button class="btn-primary" onclick="handleLogin()">Login</button>
+          <button class="btn-secondary" onclick="closeAuthModal()">Cancel</button>
+        </div>
+        <div class="switch-form">Don't have an account? <a onclick="showScreen('register')">Register</a></div>
       </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="authPassword" placeholder="Enter password" />
+
+      <!-- REGISTER SCREEN -->
+      <div id="screenRegister" style="display:none">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="regUsername" placeholder="Enter username" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="regEmail" placeholder="Enter email" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="regPassword" placeholder="Enter password" />
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="regConfirmPass" placeholder="Confirm password" />
+        </div>
+        <div class="form-buttons">
+          <button class="btn-primary" onclick="handleRegister()">Register</button>
+          <button class="btn-secondary" onclick="closeAuthModal()">Cancel</button>
+        </div>
+        <div class="switch-form">Already have an account? <a onclick="showScreen('login')">Login</a></div>
       </div>
-      <div class="form-group" id="emailGroup" style="display:none">
-        <label>Email (Optional)</label>
-        <input type="text" id="authEmail" placeholder="Enter email" />
+
+      <!-- EMAIL VERIFICATION SCREEN -->
+      <div id="screenVerify" style="display:none">
+        <div class="verification-box">
+          <h3>📧 Email Verification</h3>
+          <p>আপনার <strong id="verifyEmailShow"></strong> ইমেইলে একটি ৬ ডিজিটের কোড পাঠানো হয়েছে।</p>
+          <p style="font-size:12px;color:#0369a1">⏱ কোড ১০ মিনিটের মধ্যে মেয়াদোত্তীর্ণ হবে।</p>
+          <div class="verify-input-row">
+            <input type="text" id="verifyCodeInput" placeholder="123456" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+            <button onclick="handleVerify()">Verify</button>
+          </div>
+          <a class="resend-link" onclick="resendCode()">🔄 আবার কোড পাঠান</a>
+        </div>
+        <div class="form-buttons">
+          <button class="btn-secondary" onclick="closeAuthModal()" style="width:100%">Cancel</button>
+        </div>
       </div>
-      <div class="form-buttons">
-        <button class="btn-primary" id="authSubmitBtn">Login</button>
-        <button class="btn-secondary" onclick="closeAuthModal()">Cancel</button>
+
+      <!-- FORGOT PASSWORD SCREEN -->
+      <div id="screenForgot" style="display:none">
+        <!-- Step 1: Enter email -->
+        <div id="forgotStep1">
+          <div class="forgot-box">
+            <p><strong>🔑 Forgot Password</strong></p>
+            <p>আপনার রেজিস্টার করা ইমেইল দিন। আমরা একটি কোড পাঠাবো।</p>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="forgotEmail" placeholder="Enter registered email" />
+          </div>
+          <div class="form-buttons">
+            <button class="btn-primary" onclick="handleForgotEmail()">Send Code</button>
+            <button class="btn-secondary" onclick="showScreen('login')">← Back</button>
+          </div>
+        </div>
+        <!-- Step 2: Enter code + new password -->
+        <div id="forgotStep2" style="display:none">
+          <div class="forgot-box">
+            <p><strong>📧 Code Sent!</strong></p>
+            <p>আপনার <strong id="forgotEmailShow"></strong> ইমেইলে কোড পাঠানো হয়েছে।</p>
+            <div class="forgot-input-row">
+              <input type="text" id="forgotCodeInput" placeholder="123456" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+              <button onclick="handleForgotVerify()">Verify</button>
+            </div>
+            <a class="resend-link" onclick="resendForgotCode()">🔄 আবার কোড পাঠান</a>
+          </div>
+          <div class="form-buttons">
+            <button class="btn-secondary" onclick="showScreen('login')" style="width:100%">← Back</button>
+          </div>
+        </div>
+        <!-- Step 3: Set new password -->
+        <div id="forgotStep3" style="display:none">
+          <div class="forgot-box">
+            <p><strong>🔐 Set New Password</strong></p>
+            <p>নিচে নতুন পাসওয়ার্ড দিন।</p>
+          </div>
+          <div class="new-pass-row">
+            <label>New Password</label>
+            <input type="password" id="newPassword" placeholder="Enter new password" />
+            <label style="margin-top:10px">Confirm New Password</label>
+            <input type="password" id="confirmNewPassword" placeholder="Confirm new password" />
+          </div>
+          <div class="form-buttons" style="margin-top:16px">
+            <button class="btn-primary" onclick="handleSetNewPassword()">Save Password</button>
+            <button class="btn-secondary" onclick="showScreen('login')">← Back</button>
+          </div>
+        </div>
       </div>
-      <div class="switch-form">
-        <span id="switchText">Don't have an account? <a onclick="switchAuthMode()">Register</a></span>
-      </div>
+
     </div>
   </div>
 
@@ -571,6 +688,7 @@
       if (currentUser) {
         const premiumBadge = currentUser.isPremium ? '<span class="premium-badge">PREMIUM</span>' : '';
         userInfo.innerHTML = `
+          <button class="history-header-btn" onclick="goToPage('history')">📜 History</button>
           <span class="user-name" onclick="toggleProfile()">👤 ${currentUser.username} ${premiumBadge}</span>
           <button class="logout-btn" onclick="logout()">Logout</button>
         `;
@@ -604,67 +722,56 @@
       }
     });
 
-    function showAuthModal(mode) {
-      authMode = mode;
-      const modal = document.getElementById('authModal');
-      const title = document.getElementById('authTitle');
-      const submitBtn = document.getElementById('authSubmitBtn');
-      const emailGroup = document.getElementById('emailGroup');
-      const switchText = document.getElementById('switchText');
-
-      if (mode === 'login') {
-        title.textContent = 'Login';
-        submitBtn.textContent = 'Login';
-        emailGroup.style.display = 'none';
-        switchText.innerHTML = 'Don\'t have an account? <a onclick="switchAuthMode()">Register</a>';
-      } else {
-        title.textContent = 'Register';
-        submitBtn.textContent = 'Register';
-        emailGroup.style.display = 'block';
-        switchText.innerHTML = 'Already have an account? <a onclick="switchAuthMode()">Login</a>';
-      }
-
-      modal.classList.add('active');
-      
-      document.getElementById('authUsername').value = '';
-      document.getElementById('authPassword').value = '';
-      document.getElementById('authEmail').value = '';
+    // ============== Screen navigation ==============
+    function showScreen(name) {
+      document.getElementById('screenLogin').style.display = 'none';
+      document.getElementById('screenRegister').style.display = 'none';
+      document.getElementById('screenVerify').style.display = 'none';
+      document.getElementById('screenForgot').style.display = 'none';
+      document.getElementById('screenLogin').style.display = name==='login'?'block':'none';
+      document.getElementById('screenRegister').style.display = name==='register'?'block':'none';
+      document.getElementById('screenVerify').style.display = name==='verify'?'block':'none';
+      document.getElementById('screenForgot').style.display = name==='forgot'?'block':'none';
+      const titles = {login:'Login',register:'Register',verify:'Email Verification',forgot:'Forgot Password'};
+      document.getElementById('authTitle').textContent = titles[name]||'';
     }
 
-    function switchAuthMode() {
-      showAuthMode(authMode === 'login' ? 'register' : 'login');
+    function showAuthModal(mode) {
+      document.getElementById('authModal').classList.add('active');
+      showScreen(mode || 'login');
+      // Clear all inputs
+      ['authUsername','authPassword','regUsername','regEmail','regPassword','regConfirmPass',
+       'verifyCodeInput','forgotEmail','forgotCodeInput','newPassword','confirmNewPassword'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.value='';
+      });
+      document.getElementById('forgotStep1').style.display='block';
+      document.getElementById('forgotStep2').style.display='none';
+      document.getElementById('forgotStep3').style.display='none';
     }
 
     function closeAuthModal() {
       document.getElementById('authModal').classList.remove('active');
+      pendingReg = null;
+      pendingForgot = null;
     }
 
-    document.getElementById('authSubmitBtn').addEventListener('click', () => {
-      if (authMode === 'login') {
-        handleLogin();
-      } else {
-        handleRegister();
-      }
-    });
+    // ============== Pending state ==============
+    let pendingReg = null;      // {username, email, password, code}
+    let pendingForgot = null;   // {email, code, step}
 
+    // ============== LOGIN ==============
     function handleLogin() {
       const username = document.getElementById('authUsername').value.trim();
       const password = document.getElementById('authPassword').value.trim();
-
-      if (!username || !password) {
-        alert('Username এবং Password দিন');
-        return;
-      }
+      if (!username || !password) { alert('Username এবং Password দিন'); return; }
 
       const users = JSON.parse(localStorage.getItem('pdftools_users') || '[]');
       const user = users.find(u => u.username === username && u.password === password);
 
       if (user) {
-        currentUser = { 
-          username: user.username, 
-          email: user.email,
-          isPremium: user.isPremium || false
-        };
+        if (!user.verified) { alert('❌ আপনার Email এখনো verify করা হয়নি।'); return; }
+        currentUser = { username: user.username, email: user.email, isPremium: user.isPremium || false };
         localStorage.setItem('pdftools_user', JSON.stringify(currentUser));
         closeAuthModal();
         updateUserUI();
@@ -675,52 +782,116 @@
       }
     }
 
+    // ============== REGISTER ==============
     function handleRegister() {
-      const username = document.getElementById('authUsername').value.trim();
-      const password = document.getElementById('authPassword').value.trim();
-      const email = document.getElementById('authEmail').value.trim();
+      const username = document.getElementById('regUsername').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const confirm = document.getElementById('regConfirmPass').value.trim();
 
-      if (!username || !password) {
-        alert('Username এবং Password দিন');
-        return;
-      }
-
-      if (username.length < 3) {
-        alert('Username কমপক্ষে ৩ অক্ষরের হতে হবে');
-        return;
-      }
-
-      if (password.length < 4) {
-        alert('Password কমপক্ষে ৪ অক্ষরের হতে হবে');
-        return;
-      }
+      if (!username || !email || !password || !confirm) { alert('সকল ফিল্ড পূরণ করুন'); return; }
+      if (username.length < 3) { alert('Username কমপক্ষে ৩ অক্ষর হবে'); return; }
+      if (!email.includes('@') || !email.includes('.')) { alert('সঠিক Email দিন'); return; }
+      if (password.length < 4) { alert('Password কমপক্ষে ৪ অক্ষর হবে'); return; }
+      if (password !== confirm) { alert('Password মিলছে না'); return; }
 
       const users = JSON.parse(localStorage.getItem('pdftools_users') || '[]');
-      
-      if (users.find(u => u.username === username)) {
-        alert('❌ এই Username ইতিমধ্যে আছে');
-        return;
-      }
+      if (users.find(u => u.username === username)) { alert('❌ এই Username আছে'); return; }
+      if (users.find(u => u.email === email)) { alert('❌ এই Email আছে'); return; }
 
-      const newUser = { 
-        username, 
-        password, 
-        email, 
-        isPremium: false,
-        created: new Date().toISOString() 
-      };
-      
-      users.push(newUser);
-      localStorage.setItem('pdftools_users', JSON.stringify(users));
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      pendingReg = { username, email, password, code };
 
-      // Auto-login after registration
-      currentUser = { username, email, isPremium: false };
-      localStorage.setItem('pdftools_user', JSON.stringify(currentUser));
-      closeAuthModal();
-      updateUserUI();
-      alert('✅ রেজিস্ট্রেশন সফল! আপনি এখন লগইন করা আছেন।');
+      // Demo: show code in console + alert
+      console.log('[DEMO] Verification code for ' + email + ' : ' + code);
+      alert('📧 Verification code পাঠানো হয়েছে: ' + code + '\n(Demo মোড – এটি আসলে ইমেইলে যাবে)');
+
+      document.getElementById('verifyEmailShow').textContent = email;
+      showScreen('verify');
     }
 
+    // ============== VERIFY EMAIL ==============
+    function handleVerify() {
+      if (!pendingReg) { alert('❌ ডেটা হারিয়ে গেছে। আবার রেজিস্ট্রেশন করুন।'); return; }
+      const entered = document.getElementById('verifyCodeInput').value.trim();
+      if (entered !== pendingReg.code) { alert('❌ ভুল কোড'); return; }
+
+      const users = JSON.parse(localStorage.getItem('pdftools_users') || '[]');
+      users.push({ username: pendingReg.username, email: pendingReg.email, password: pendingReg.password, isPremium: false, verified: true, created: new Date().toISOString() });
+      localStorage.setItem('pdftools_users', JSON.stringify(users));
+
+      currentUser = { username: pendingReg.username, email: pendingReg.email, isPremium: false };
+      localStorage.setItem('pdftools_user', JSON.stringify(currentUser));
+      pendingReg = null;
+      closeAuthModal();
+      updateUserUI();
+      alert('🎉 রেজিস্ট্রেশন সফল! Email verified!');
+    }
+
+    function resendCode() {
+      if (!pendingReg) return;
+      pendingReg.code = String(Math.floor(100000 + Math.random() * 900000));
+      console.log('[DEMO] New code: ' + pendingReg.code);
+      alert('📧 নতুন কোড পাঠানো হয়েছে: ' + pendingReg.code + '\n(Demo মোড)');
+    }
+
+    // ============== FORGOT PASSWORD ==============
+    function handleForgotEmail() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      if (!email) { alert('Email দিন'); return; }
+
+      const users = JSON.parse(localStorage.getItem('pdftools_users') || '[]');
+      const user = users.find(u => u.email === email);
+      if (!user) { alert('❌ এই Email রেজিস্টার করা নেই'); return; }
+
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      pendingForgot = { email, code };
+
+      console.log('[DEMO] Forgot code for ' + email + ' : ' + code);
+      alert('📧 কোড পাঠানো হয়েছে: ' + code + '\n(Demo মোড – এটি আসলে ইমেইলে লিংক যাবে)');
+
+      document.getElementById('forgotEmailShow').textContent = email;
+      document.getElementById('forgotStep1').style.display = 'none';
+      document.getElementById('forgotStep2').style.display = 'block';
+    }
+
+    function handleForgotVerify() {
+      if (!pendingForgot) return;
+      const entered = document.getElementById('forgotCodeInput').value.trim();
+      if (entered !== pendingForgot.code) { alert('❌ ভুল কোড'); return; }
+
+      // Code OK → show new password fields
+      document.getElementById('forgotStep2').style.display = 'none';
+      document.getElementById('forgotStep3').style.display = 'block';
+    }
+
+    function resendForgotCode() {
+      if (!pendingForgot) return;
+      pendingForgot.code = String(Math.floor(100000 + Math.random() * 900000));
+      console.log('[DEMO] New forgot code: ' + pendingForgot.code);
+      alert('📧 নতুন কোড: ' + pendingForgot.code + '\n(Demo মোড)');
+    }
+
+    function handleSetNewPassword() {
+      if (!pendingForgot) return;
+      const np = document.getElementById('newPassword').value.trim();
+      const cnp = document.getElementById('confirmNewPassword').value.trim();
+      if (!np || !cnp) { alert('দুটো ফিল্ড পূরণ করুন'); return; }
+      if (np.length < 4) { alert('Password কমপক্ষে ৪ অক্ষর হবে'); return; }
+      if (np !== cnp) { alert('Password মিলছে না'); return; }
+
+      const users = JSON.parse(localStorage.getItem('pdftools_users') || '[]');
+      const idx = users.findIndex(u => u.email === pendingForgot.email);
+      if (idx === -1) { alert('❌ ব্যবহারকারী পাওয়া গেল না'); return; }
+      users[idx].password = np;
+      localStorage.setItem('pdftools_users', JSON.stringify(users));
+
+      pendingForgot = null;
+      alert('✅ পাসওয়ার্ড পরিবর্তন সফল! এখন লগইন করুন।');
+      showScreen('login');
+    }
+
+    // ============== LOGOUT ==============
     function logout() {
       if (confirm('লগআউট করতে চান?')) {
         currentUser = null;
@@ -735,7 +906,6 @@
     // ============== Premium System ==============
     function checkPremiumAccess(pageId) {
       const isPremium = currentUser && currentUser.isPremium;
-      
       if (pageId === 'pdfUnlock') {
         document.getElementById('unlockPremiumBlock').style.display = isPremium ? 'none' : 'block';
         document.getElementById('unlockContent').style.display = isPremium ? 'block' : 'none';
@@ -746,33 +916,18 @@
     }
 
     function upgradeToPremium() {
-      if (!currentUser) {
-        alert('প্রথমে লগইন করুন');
-        showAuthModal('login');
-        return;
-      }
-
+      if (!currentUser) { alert('প্রথমে লগইন করুন'); showAuthModal('login'); return; }
       if (confirm('Premium মেম্বারশিপ নিতে চান?\n\n📞 আসল প্রিমিয়াম সার্ভিসের জন্য 01305-482427 নাম্বারে যোগাযোগ করুন।\n\n(ডেমো: এখন ফ্রি আপগ্রেড করবেন?)')) {
         const users = JSON.parse(localStorage.getItem('pdftools_users') || '[]');
-        const userIndex = users.findIndex(u => u.username === currentUser.username);
-        
-        if (userIndex !== -1) {
-          users[userIndex].isPremium = true;
-          localStorage.setItem('pdftools_users', JSON.stringify(users));
-        }
-
+        const idx = users.findIndex(u => u.username === currentUser.username);
+        if (idx !== -1) { users[idx].isPremium = true; localStorage.setItem('pdftools_users', JSON.stringify(users)); }
         currentUser.isPremium = true;
         localStorage.setItem('pdftools_user', JSON.stringify(currentUser));
-        
         updateUserUI();
         alert('🎉 অভিনন্দন! আপনি এখন Premium মেম্বার! (ডেমো মোড)');
-        
-        const currentPageId = document.querySelector('.page.active').id;
-        if (currentPageId === 'pdfUnlockPage') {
-          checkPremiumAccess('pdfUnlock');
-        } else if (currentPageId === 'pdfComparePage') {
-          checkPremiumAccess('pdfCompare');
-        }
+        const curPage = document.querySelector('.page.active').id;
+        if (curPage === 'pdfUnlockPage') checkPremiumAccess('pdfUnlock');
+        else if (curPage === 'pdfComparePage') checkPremiumAccess('pdfCompare');
       }
     }
 
@@ -1312,10 +1467,7 @@
 
     convertToJpgBtn.addEventListener('click', async () => {
       const file = pdfToJpgFileInput.files[0];
-      if (!file) {
-        alert('একটি PDF ফাইল নির্বাচন করুন');
-        return;
-      }
+      if (!file) { alert('একটি PDF ফাইল নির্বাচন করুন'); return; }
 
       convertToJpgBtn.disabled = true;
       jpgStatus.textContent = 'PDF লোড হচ্ছে...';
@@ -1327,88 +1479,80 @@
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const numPages = pdf.numPages;
-
-        jpgStatus.textContent = `${numPages} টি পেজ পাওয়া গেছে...`;
+        jpgStatus.textContent = numPages + ' টি পেজ পাওয়া গেছে...';
         jpgProgressFill.style.width = '20%';
 
         const quality = parseFloat(jpgQualitySel.value);
         const scale = parseFloat(jpgScaleSel.value);
-        const images = [];
+        const baseName = file.name.replace(/\.pdf$/i, '');
+        const rendered = []; // {dataUrl, pageNum}
 
-        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-          jpgStatus.textContent = `পেজ ${pageNum}/${numPages} কনভার্ট হচ্ছে...`;
-          jpgProgressFill.style.width = (20 + (pageNum / numPages) * 70) + '%';
+        for (let p = 1; p <= numPages; p++) {
+          jpgStatus.textContent = 'পেজ ' + p + '/' + numPages + ' কনভার্ট হচ্ছে...';
+          jpgProgressFill.style.width = (20 + (p / numPages) * 60) + '%';
 
-          const page = await pdf.getPage(pageNum);
-          const viewport = page.getViewport({ scale: scale });
-
+          const page = await pdf.getPage(p);
+          const viewport = page.getViewport({ scale });
           const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
           canvas.width = viewport.width;
           canvas.height = viewport.height;
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
 
-          await page.render({ canvasContext: context, viewport: viewport }).promise;
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          rendered.push({ dataUrl, pageNum: p });
 
-          const imgDataUrl = canvas.toDataURL('image/jpeg', quality);
-          
-          const thumbDiv = document.createElement('div');
-          thumbDiv.className = 'thumb';
-          thumbDiv.style.width = '150px';
-          thumbDiv.style.height = '200px';
-          thumbDiv.style.cursor = 'default';
-          const thumbImg = document.createElement('img');
-          thumbImg.src = imgDataUrl;
-          thumbDiv.appendChild(thumbImg);
-          
-          const pageLabel = document.createElement('p');
-          pageLabel.textContent = `Page ${pageNum}`;
-          pageLabel.style.textAlign = 'center';
-          pageLabel.style.margin = '5px 0 0 0';
-          pageLabel.style.fontSize = '12px';
-          
-          const wrapper = document.createElement('div');
-          wrapper.appendChild(thumbDiv);
-          wrapper.appendChild(pageLabel);
-          jpgPreview.appendChild(wrapper);
+          // Thumbnail preview
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'text-align:center';
+          const thumb = document.createElement('div');
+          thumb.className = 'thumb';
+          thumb.style.cssText = 'width:140px;height:180px;cursor:default';
+          const img = document.createElement('img');
+          img.src = dataUrl;
+          thumb.appendChild(img);
+          wrap.appendChild(thumb);
+          const lbl = document.createElement('p');
+          lbl.style.cssText = 'font-size:12px;color:#666;margin-top:4px';
+          lbl.textContent = 'Page ' + p;
+          wrap.appendChild(lbl);
+          jpgPreview.appendChild(wrap);
 
-          images.push({
-            dataUrl: imgDataUrl,
-            pageNum: pageNum
+          await new Promise(r => setTimeout(r, 80));
+        }
+
+        jpgProgressFill.style.width = '85%';
+
+        if (numPages === 1) {
+          // ---- SINGLE PAGE → direct .jpg download ----
+          jpgStatus.textContent = 'JPG ডাউনলোড হচ্ছে...';
+          const blob = dataUrlToBlob(rendered[0].dataUrl);
+          const dlName = baseName + '.jpg';
+
+          const b64 = await blobToBase64(blob);
+          saveToHistory('PDF to JPG', file.name, { base64: b64, mimeType: 'image/jpeg', downloadName: dlName });
+
+          triggerDownload(blob, dlName);
+          jpgProgressFill.style.width = '100%';
+          jpgStatus.textContent = '✅ সম্পন্ন! একটি JPG সরাসরি ডাউনলোড হয়েছে।';
+
+        } else {
+          // ---- MULTIPLE PAGES → ZIP ----
+          jpgStatus.textContent = 'ZIP তৈরি হচ্ছে...';
+          const zip = new JSZip();
+          rendered.forEach(item => {
+            const raw = item.dataUrl.split(',')[1];
+            zip.file(baseName + '_page_' + item.pageNum + '.jpg', raw, { base64: true });
           });
+          const zipBlob = await zip.generateAsync({ type: 'blob' });
+          const dlName = baseName + '_images.zip';
 
-          await new Promise(r => setTimeout(r, 100));
+          const b64 = await blobToBase64(zipBlob);
+          saveToHistory('PDF to JPG', file.name, { base64: b64, mimeType: 'application/zip', downloadName: dlName });
+
+          triggerDownload(zipBlob, dlName);
+          jpgProgressFill.style.width = '100%';
+          jpgStatus.textContent = '✅ সম্পন্ন! ' + numPages + ' টি JPG → ZIP ডাউনলোড হয়েছে।';
         }
-
-        jpgStatus.textContent = 'ZIP ফাইল তৈরি হচ্ছে...';
-        jpgProgressFill.style.width = '95%';
-
-        const zip = new JSZip();
-        const baseName = file.name.replace('.pdf', '');
-
-        for (let i = 0; i < images.length; i++) {
-          const base64Data = images[i].dataUrl.split(',')[1];
-          zip.file(`${baseName}_page_${images[i].pageNum}.jpg`, base64Data, { base64: true });
-        }
-
-        const zipBlob = await zip.generateAsync({ type: 'blob' });
-        const downloadName = `${baseName}_images.zip`;
-
-        const base64 = await blobToBase64(zipBlob);
-        saveToHistory('PDF to JPG', file.name, {
-          base64: base64,
-          mimeType: 'application/zip',
-          downloadName: downloadName
-        });
-
-        const url = URL.createObjectURL(zipBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = downloadName;
-        a.click();
-        URL.revokeObjectURL(url);
-
-        jpgProgressFill.style.width = '100%';
-        jpgStatus.textContent = `✅ সম্পন্ন! ${numPages} টি JPG ডাউনলোড হয়েছে।`;
 
       } catch (err) {
         console.error(err);
@@ -1416,14 +1560,26 @@
         jpgStatus.textContent = 'কনভার্শন ব্যর্থ';
       } finally {
         convertToJpgBtn.disabled = false;
-        setTimeout(() => {
-          jpgProgressBar.style.display = 'none';
-          jpgProgressFill.style.width = '0';
-        }, 5000);
+        setTimeout(() => { jpgProgressBar.style.display = 'none'; jpgProgressFill.style.width = '0'; }, 4000);
       }
     });
 
-    // ============== PDF Unlock (Premium) ==============
+    // Helper: dataUrl → Blob
+    function dataUrlToBlob(dataUrl) {
+      const raw = atob(dataUrl.split(',')[1]);
+      const arr = new Uint8Array(raw.length);
+      for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+      return new Blob([arr], { type: 'image/jpeg' });
+    }
+    // Helper: trigger download
+    function triggerDownload(blob, name) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+        // ============== PDF Unlock (Premium) ==============
     const unlockPdfFileInput = document.getElementById('unlockPdfFile');
     const pdfPasswordInput = document.getElementById('pdfPassword');
     const unlockBtn = document.getElementById('unlockBtn');
