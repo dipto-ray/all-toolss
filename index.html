@@ -32,9 +32,49 @@
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg-primary);color:var(--text-primary);position:relative;overflow-x:hidden;min-height:100vh;padding-top:60px;transition:all 0.3s}
     
-    .header{position:fixed;top:0;left:0;right:0;background:var(--bg-secondary);box-shadow:0 2px 10px var(--shadow);z-index:1000;padding:12px 20px}
+    .header{position:fixed;top:0;left:0;right:0;background:#000000;box-shadow:0 2px 10px var(--shadow);z-index:1000;padding:12px 20px}
     .header-content{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-    .logo{font-size:16px;font-weight:bold;color:#2b6cb0;cursor:pointer}
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    @keyframes rotate360 {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes fallAndRise {
+      0% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(300px); opacity: 0.8; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    
+    .logo{
+      font-size:32px;
+      font-weight:bold;
+      color:#ffffff;
+      cursor:pointer;
+      font-family:'Brush Script MT', cursive, 'Segoe Script', 'Comic Sans MS';
+      font-style:italic;
+      position:relative;
+      letter-spacing:2px;
+      text-shadow:2px 2px 4px rgba(255,255,255,0.3);
+      animation: shake 0.8s ease-in-out;
+      animation-iteration-count: 1;
+    }
+    .logo::after{
+      content:'';
+      position:absolute;
+      bottom:-3px;
+      left:0;
+      width:100%;
+      height:2px;
+      background:#ffffff;
+      transform:scaleX(0.95);
+    }
     .header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .theme-toggle{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer;font-size:14px}
     .history-toggle-btn{background:#059669;color:#fff;border:0;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px}
@@ -74,7 +114,95 @@
     .tool-card.premium{opacity:1;border:3px solid #e0e7ff !important}
     .tool-card.premium:hover{border-color:#2b6cb0 !important}
     .tool-card.premium::after{content:'🔒 Premium';position:absolute;top:10px;right:10px;background:#fbbf24;color:#000;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:bold;box-shadow:0 2px 8px rgba(251,191,36,0.4)}
-    .tool-icon{font-size:48px;margin-bottom:15px;text-align:center}
+    
+    /* Tool Icon Animations */
+    .tool-icon{font-size:48px;margin-bottom:15px;text-align:center;display:block;width:100%}
+    
+    /* Merge animation - files coming together */
+    @keyframes merge {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15) rotate(5deg); }
+    }
+    .tool-card[data-tool="merge"] .tool-icon {
+      animation: merge 2s ease-in-out infinite;
+    }
+    
+    /* Split animation - breaking apart */
+    @keyframes split {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+    .tool-card[data-tool="split"] .tool-icon {
+      animation: split 1.5s ease-in-out infinite;
+    }
+    
+    /* Compress animation - squeeze effect */
+    @keyframes compress {
+      0%, 100% { transform: scaleY(1) scaleX(1); }
+      50% { transform: scaleY(0.85) scaleX(1.1); }
+    }
+    .tool-card[data-tool="compress"] .tool-icon {
+      animation: compress 2s ease-in-out infinite;
+    }
+    
+    /* Rotate animation - spinning */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .tool-card[data-tool="rotate"] .tool-icon {
+      animation: spin 4s linear infinite;
+    }
+    
+    /* Convert animation - transformation */
+    @keyframes convert {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(10deg); }
+    }
+    .tool-card[data-tool="img2pdf"] .tool-icon,
+    .tool-card[data-tool="pdf2img"] .tool-icon {
+      animation: convert 2.5s ease-in-out infinite;
+    }
+    
+    /* Lock animation - up and down */
+    @keyframes lock {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .tool-card[data-tool="encrypt"] .tool-icon,
+    .tool-card[data-tool="decrypt"] .tool-icon {
+      animation: lock 1.8s ease-in-out infinite;
+    }
+    
+    /* Page animation - flip effect */
+    @keyframes pageFlip {
+      0%, 100% { transform: rotateY(0deg); }
+      50% { transform: rotateY(180deg); }
+    }
+    .tool-card[data-tool="organize"] .tool-icon,
+    .tool-card[data-tool="extract"] .tool-icon {
+      animation: pageFlip 3s ease-in-out infinite;
+    }
+    
+    /* Bounce animation */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .tool-card[data-tool="watermark"] .tool-icon {
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    /* Pulse animation */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.9; }
+    }
+    .tool-card[data-tool="metadata"] .tool-icon {
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
     .tool-title{font-size:18px;font-weight:bold;color:#2b6cb0;margin-bottom:8px;text-align:center}
     .tool-desc{font-size:13px;color:var(--text-secondary);text-align:center}
     
@@ -259,12 +387,62 @@
       cursor:pointer;
       font-size:12px;
     }
+    
+    /* Stats Section */
+    .stats-section{
+      background:linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+      padding:60px 20px;
+      margin:40px 0 0 0;
+      border-radius:0;
+    }
+    .stats-container{
+      max-width:1200px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:40px;
+      text-align:center;
+    }
+    .stat-item{
+      color:#fff;
+    }
+    .stat-item h3{
+      font-size:56px;
+      font-weight:bold;
+      margin-bottom:10px;
+      text-shadow:2px 2px 4px rgba(0,0,0,0.2);
+    }
+    .stat-item p{
+      font-size:20px;
+      color:#fff;
+      opacity:0.95;
+    }
+    
+    @media (max-width:1024px){
+      .stats-container{
+        grid-template-columns:repeat(2, 1fr);
+        gap:30px;
+      }
+    }
+    
+    @media (max-width:640px){
+      .stats-container{
+        grid-template-columns:1fr;
+        gap:25px;
+      }
+      .stat-item h3{
+        font-size:48px;
+      }
+      .stat-item p{
+        font-size:18px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="header-content">
-      <div class="logo" onclick="showPage('home')" style="font-size:20px">I LOVE U PRO TOOLS</div>
+      <div class="logo" id="logoElement" onclick="rotateAndReload()"><span style="color:#00d9ff;">Dipto</span> <span style="color:#f59e0b;">Ray</span></div>
       <div class="header-actions">
         <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
         <button class="success-btn" onclick="showLoginRegister()">Login/Register</button>
@@ -304,77 +482,76 @@
   <div class="container">
     <div id="home" class="page active">
       <div class="card">
-        <h1>All in One Solution</h1>
-        <p class="muted" style="font-size:16px;font-weight:500">আপনার প্রতিষ্ঠানের কাজ সহজ ও পেশাদার করুন</p>
+        <p style="font-size:24px;font-weight:600;color:#2b6cb0;text-align:center;margin-bottom:25px;line-height:1.8">স্বল্প সময়ে দ্রুত, নির্ভুল ও নির্ভরযোগ্যভাবে যেকোনো কাজ সম্পন্ন করুন।<br>আপনার প্রতিষ্ঠানের কাজকে করুন আরও সহজ ও পেশাদার।</p>
         
         <div class="tool-grid">
-          <div class="tool-card" onclick="showPage('img2pdf')">
+          <div class="tool-card" data-tool="img2pdf" onclick="showPage('img2pdf')">
             <div class="tool-icon">📸</div>
             <div class="tool-title">Image to PDF তৈরি করুন</div>
             <div class="tool-desc">একাধিক Image দিয়ে PDF তৈরি করুন</div>
           </div>
           
-          <div class="tool-card" onclick="showPage('merge')">
+          <div class="tool-card" data-tool="merge" onclick="showPage('merge')">
             <div class="tool-icon">🔗</div>
             <div class="tool-title">PDF একত্রিত করুন</div>
             <div class="tool-desc">একাধিক PDF ফাইল একটিতে একত্রে করুন</div>
           </div>
           
-          <div class="tool-card" onclick="showPage('split')">
+          <div class="tool-card" data-tool="split" onclick="showPage('split')">
             <div class="tool-icon">✂️</div>
             <div class="tool-title">PDF ভাগ করুন</div>
             <div class="tool-desc"> একাধিক PDF ফাইল থেকে আলাদা পেজে বিভক্ত করুন</div>
           </div>
           
-          <div class="tool-card" onclick="showPage('compress')">
+          <div class="tool-card" data-tool="compress" onclick="showPage('compress')">
             <div class="tool-icon">🗜️</div>
             <div class="tool-title">PDF কমপ্রেস করুন</div>
             <div class="tool-desc">PDF ফাইলের সাইজ ছোট করুন</div>
           </div>
           
-          <div class="tool-card" onclick="showPage('pdf2img')">
+          <div class="tool-card" data-tool="pdf2img" onclick="showPage('pdf2img')">
             <div class="tool-icon">🖼️</div>
-            <div class="tool-title">PDF থেকে ছবি</div>
+            <div class="tool-title">PDF থেকে Image</div>
             <div class="tool-desc">PDF কে JPG/PNG এ রূপান্তর করুন</div>
           </div>
           
-          <div class="tool-card" onclick="showPage('rotate')">
+          <div class="tool-card" data-tool="rotate" onclick="showPage('rotate')">
             <div class="tool-icon">🔄</div>
             <div class="tool-title">PDF ইচ্ছা মত ঘুরান</div>
             <div class="tool-desc">PDF পেজ ঘুরিয়ে সংশোধন করুন</div>
           </div>
           
-          <div class="tool-card" onclick="showPage('organize')">
+          <div class="tool-card" data-tool="organize" onclick="showPage('organize')">
             <div class="tool-icon">📑</div>
             <div class="tool-title">PDF পেজ ইচ্ছামত সাজান</div>
             <div class="tool-desc">PDF পেজ পুনর্বিন্যাস করুন</div>
           </div>
           
-          <div class="tool-card premium" onclick="showPremiumModal('watermark')">
+          <div class="tool-card premium" data-tool="watermark" onclick="showPremiumModal('watermark')">
             <div class="tool-icon">💧</div>
             <div class="tool-title">ওয়াটারমার্ক যোগ করুন</div>
             <div class="tool-desc">PDF এ টেক্সট ওয়াটারমার্ক যোগ করুন</div>
           </div>
           
-          <div class="tool-card premium" onclick="showPremiumModal('protect')">
+          <div class="tool-card premium" data-tool="encrypt" onclick="showPremiumModal('protect')">
             <div class="tool-icon">🔒</div>
             <div class="tool-title">PDF সুরক্ষিত করুন</div>
             <div class="tool-desc">পাসওয়ার্ড দিয়ে PDF লক করুন</div>
           </div>
           
-          <div class="tool-card premium" onclick="showPremiumModal('unlock')">
+          <div class="tool-card premium" data-tool="decrypt" onclick="showPremiumModal('unlock')">
             <div class="tool-icon">🔓</div>
             <div class="tool-title">PDF আনলক করুন</div>
             <div class="tool-desc">পাসওয়ার্ড সরিয়ে ফেলুন</div>
           </div>
           
-          <div class="tool-card premium" onclick="showPremiumModal('compare')">
+          <div class="tool-card premium" data-tool="metadata" onclick="showPremiumModal('compare')">
             <div class="tool-icon">🔍</div>
             <div class="tool-title">PDF তুলনা করুন</div>
             <div class="tool-desc">দুটি PDF এর পার্থক্য দেখুন</div>
           </div>
           
-          <div class="tool-card premium" onclick="showPremiumModal('ocr')">
+          <div class="tool-card premium" data-tool="extract" onclick="showPremiumModal('ocr')">
             <div class="tool-icon">📝</div>
             <div class="tool-title">OCR (টেক্সট শনাক্ত)</div>
             <div class="tool-desc">স্ক্যান করা PDF থেকে টেক্সট বের করুন</div>
@@ -413,7 +590,7 @@
     <div id="merge" class="page">
       <button class="back-btn" onclick="showPage('home');resetMergePDF()">← পিছনে যান</button>
       <div class="card">
-        <h2>🗜️ PDF কমপ্রেস করুন</h2>
+        <h2>🔗 PDF একত্রিত করুন</h2>
         
         <div class="center-content">
           <label for="mergeInput" class="file-upload-btn">📁 PDF ফাইল নির্বাচন করুন (একাধিক)</label>
@@ -607,8 +784,76 @@
 
   </div>
 
-  <footer style="text-align:center;padding:30px 20px;background:var(--bg-secondary);margin-top:50px;border-top:1px solid var(--border)">
-    <p style="color:var(--text-secondary);font-size:14px;margin:0">Copyright © 2026 Dipto Ray</p>
+
+  <!-- Stats Section -->
+  <div class="stats-section">
+    <div class="stats-container">
+      <div class="stat-item">
+        <h3 id="toolsCounter">0</h3>
+        <p>শক্তিশালী টুলস</p>
+      </div>
+      <div class="stat-item">
+        <h3 id="customersCounter">0</h3>
+        <p>সন্তুষ্ট কাস্টমার</p>
+      </div>
+      <div class="stat-item">
+        <h3>24/7</h3>
+        <p>সবসময় উপলব্ধ</p>
+      </div>
+      <div class="stat-item">
+        <h3>Free</h3>
+        <p>সম্পূর্ণ বিনামূল্যে</p>
+      </div>
+    </div>
+  </div>
+  </div>
+  
+  <footer style="background:#000000;margin-top:0;border-top:none;padding:40px 20px 20px">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;text-align:center">
+      
+      <!-- Contact Section -->
+      <div>
+        <h3 style="color:#ffffff;margin-bottom:15px;font-size:18px">Contact</h3>
+        <p style="color:#ffffff;font-weight:600;margin:8px 0">Dipto Ray</p>
+        <p style="color:#cccccc;margin:8px 0">📞 +880 1305482427</p>
+        
+        <!-- Social Media Icons -->
+        <div style="display:flex;justify-content:center;gap:25px;margin-top:20px;align-items:center">
+          <!-- Facebook -->
+          <a href="https://www.facebook.com/real.diptoray" target="_blank" style="color:#1877f2;transition:all 0.3s;display:inline-block" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </a>
+          
+          <!-- YouTube -->
+          <a href="https://www.youtube.com/@diptoray" target="_blank" style="color:#FF0000;transition:all 0.3s;display:inline-block" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+          </a>
+          
+          <!-- X (Twitter) -->
+          <a href="https://twitter.com/diptoray" target="_blank" style="color:#ffffff;transition:all 0.3s;display:inline-block" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Privacy Policy Section -->
+      <div>
+        <h3 style="color:#ffffff;margin-bottom:15px;font-size:18px">Privacy Policy</h3>
+        <p style="color:#cccccc;font-size:14px;line-height:1.6;margin:8px 0">আপনার সকল ডেটা সম্পূর্ণ নিরাপদ। সকল প্রসেসিং ব্রাউজারেই হয়, কোনো সার্ভারে ডেটা পাঠানো হয় না।</p>
+      </div>
+      
+    </div>
+    
+    <!-- Copyright -->
+    <div style="text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid #333333">
+      <p style="color:#cccccc;font-size:14px;margin:0">© Copyright 2026 - All Rights Reserved</p>
+    </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@latest/dist/jspdf.umd.min.js"></script>
@@ -1197,78 +1442,271 @@
       progressBar.style.width = '0%';
       
       try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const originalSize = file.size;
+        let bestBlob = null;
+        let bestSize = originalSize;
+        let bestMethod = 'original';
         
-        const { jsPDF } = window.jspdf;
-        const newPdf = new jsPDF();
-        
-        // Optimal compression settings - maintains quality while reducing size
-        const settings = { quality: 0.88, scale: 1.9 };
-        
-        for (let i = 1; i <= pdf.numPages; i++) {
-          progressBar.style.width = ((i / pdf.numPages) * 100) + '%';
+        // METHOD 1: Try pdf-lib compression
+        try {
+          progressBar.style.width = '15%';
+          const { PDFDocument } = PDFLib;
+          const arrayBuffer = await file.arrayBuffer();
+          const pdfDoc = await PDFDocument.load(arrayBuffer);
           
-          const page = await pdf.getPage(i);
-          const viewport = page.getViewport({ scale: settings.scale });
+          const pdfBytes = await pdfDoc.save({
+            useObjectStreams: true,
+            addDefaultPage: false,
+            objectsPerTick: 50
+          });
           
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          
-          await page.render({ canvasContext: ctx, viewport }).promise;
-          
-          if (i > 1) newPdf.addPage();
-          
-          const imgData = canvas.toDataURL('image/jpeg', settings.quality);
-          newPdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-          
-          canvas.width = 0;
-          canvas.height = 0;
+          const blob1 = new Blob([pdfBytes], { type: 'application/pdf' });
+          if (blob1.size < bestSize) {
+            bestBlob = blob1;
+            bestSize = blob1.size;
+            bestMethod = 'pdf-lib';
+          }
+        } catch (e) {
+          console.log('Method 1 failed:', e);
         }
         
-        const compressed = newPdf.output('blob');
+        // METHOD 2: Image-based compression with low quality (readable)
+        try {
+          progressBar.style.width = '35%';
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const numPages = pdf.numPages;
+          
+          const { jsPDF } = window.jspdf;
+          const compressedPdf = new jsPDF({
+            compress: true,
+            unit: 'pt',
+            format: 'a4'
+          });
+          
+          let firstPage = true;
+          
+          for (let i = 1; i <= numPages; i++) {
+            const page = await pdf.getPage(i);
+            
+            // Better scale for readability
+            const viewport = page.getViewport({ scale: 1.0 });
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d', { 
+              alpha: false,
+              willReadFrequently: false
+            });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            await page.render({
+              canvasContext: context,
+              viewport: viewport,
+              intent: 'print'
+            }).promise;
+            
+            // Balanced compression - readable but compressed
+            const imgData = canvas.toDataURL('image/jpeg', 0.5);
+            
+            if (!firstPage) {
+              compressedPdf.addPage();
+            }
+            firstPage = false;
+            
+            const pageWidth = compressedPdf.internal.pageSize.getWidth();
+            const pageHeight = compressedPdf.internal.pageSize.getHeight();
+            
+            compressedPdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+          }
+          
+          const blob2 = compressedPdf.output('blob');
+          if (blob2.size < bestSize) {
+            bestBlob = blob2;
+            bestSize = blob2.size;
+            bestMethod = 'image-balanced';
+          }
+        } catch (e) {
+          console.log('Method 2 failed:', e);
+        }
         
-        // Download without opening new tab
-        const url = URL.createObjectURL(compressed);
+        // METHOD 3: Image-based compression with medium-low quality
+        try {
+          progressBar.style.width = '60%';
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const numPages = pdf.numPages;
+          
+          const { jsPDF } = window.jspdf;
+          const compressedPdf = new jsPDF({
+            compress: true,
+            unit: 'pt',
+            format: 'a4'
+          });
+          
+          let firstPage = true;
+          
+          for (let i = 1; i <= numPages; i++) {
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 1.2 });
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d', { alpha: false });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            await page.render({
+              canvasContext: context,
+              viewport: viewport
+            }).promise;
+            
+            const imgData = canvas.toDataURL('image/jpeg', 0.6);
+            
+            if (!firstPage) {
+              compressedPdf.addPage();
+            }
+            firstPage = false;
+            
+            const pageWidth = compressedPdf.internal.pageSize.getWidth();
+            const pageHeight = compressedPdf.internal.pageSize.getHeight();
+            
+            compressedPdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'MEDIUM');
+          }
+          
+          const blob3 = compressedPdf.output('blob');
+          if (blob3.size < bestSize) {
+            bestBlob = blob3;
+            bestSize = blob3.size;
+            bestMethod = 'image-medium';
+          }
+        } catch (e) {
+          console.log('Method 3 failed:', e);
+        }
+        
+        // METHOD 4: Image-based compression with good quality
+        try {
+          progressBar.style.width = '80%';
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const numPages = pdf.numPages;
+          
+          const { jsPDF } = window.jspdf;
+          const compressedPdf = new jsPDF({
+            compress: true,
+            unit: 'pt',
+            format: 'a4'
+          });
+          
+          let firstPage = true;
+          
+          for (let i = 1; i <= numPages; i++) {
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 1.5 });
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            await page.render({
+              canvasContext: context,
+              viewport: viewport
+            }).promise;
+            
+            const imgData = canvas.toDataURL('image/jpeg', 0.7);
+            
+            if (!firstPage) {
+              compressedPdf.addPage();
+            }
+            firstPage = false;
+            
+            const pageWidth = compressedPdf.internal.pageSize.getWidth();
+            const pageHeight = compressedPdf.internal.pageSize.getHeight();
+            
+            compressedPdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'SLOW');
+          }
+          
+          const blob4 = compressedPdf.output('blob');
+          if (blob4.size < bestSize) {
+            bestBlob = blob4;
+            bestSize = blob4.size;
+            bestMethod = 'image-good';
+          }
+        } catch (e) {
+          console.log('Method 4 failed:', e);
+        }
+        
+        progressBar.style.width = '95%';
+        
+        // If no method worked or size increased, use original file
+        if (!bestBlob || bestSize >= originalSize) {
+          bestBlob = file;
+          bestSize = originalSize;
+          bestMethod = 'original';
+        }
+        
+        progressBar.style.width = '100%';
+        
+        const reduction = ((originalSize - bestSize) / originalSize) * 100;
+        
+        // Show results
+        if (bestMethod === 'original') {
+          sizeInfo.style.display = 'block';
+          sizeInfo.innerHTML = `<strong>ℹ️ তথ্য</strong><br>
+                                <strong>মূল সাইজ:</strong> ${(originalSize / 1024).toFixed(2)} KB<br>
+                                <strong>ফলাফল:</strong> এই PDF ইতিমধ্যে সর্বোচ্চ কমপ্রেসড। মূল ফাইল ডাউনলোড হচ্ছে।<br>
+                                <em style="color:#f59e0b">কোন compression method সাইজ কমাতে পারেনি</em>`;
+        } else {
+          sizeInfo.style.display = 'block';
+          const emoji = reduction >= 70 ? '🎉' : reduction >= 50 ? '✅' : '✔️';
+          sizeInfo.innerHTML = `<strong>${emoji} সফল!</strong><br>
+                                <strong>মূল সাইজ:</strong> ${(originalSize / 1024).toFixed(2)} KB<br>
+                                <strong>কমপ্রেসড সাইজ:</strong> ${(bestSize / 1024).toFixed(2)} KB<br>
+                                <strong>সাশ্রয়:</strong> ${reduction.toFixed(1)}%<br>
+                                <em style="color:#059669">Method: ${bestMethod}</em>`;
+        }
+        
+        // Download the best result
+        const url = URL.createObjectURL(bestBlob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'compressed_' + file.name;
+        link.download = bestMethod === 'original' ? file.name : 'compressed_' + file.name;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
         
-        sizeInfo.style.display = 'block';
-        sizeInfo.innerHTML = `<strong>✅ সফল!</strong><br>
-                              <strong>মূল সাইজ:</strong> ${(file.size / 1024).toFixed(2)} KB<br>
-                              <strong>কমপ্রেসড সাইজ:</strong> ${(compressed.size / 1024).toFixed(2)} KB<br>
-                              <strong>সাশ্রয়:</strong> ${(((file.size - compressed.size) / file.size) * 100).toFixed(1)}%`;
-        
-        const reader = new FileReader();
-        reader.onload = () => {
-          saveToHistory('PDF কমপ্রেস', 'compressed_' + file.name, {
-            base64: reader.result.split(',')[1],
-            mimeType: 'application/pdf',
-            downloadName: 'compressed_' + file.name,
-            size: compressed.size,
-            originalSize: file.size
-          });
-        };
-        reader.readAsDataURL(compressed);
+        // Save to history only if compressed
+        if (bestMethod !== 'original') {
+          const reader = new FileReader();
+          reader.onload = () => {
+            saveToHistory('PDF কমপ্রেস', 'compressed_' + file.name, {
+              base64: reader.result.split(',')[1],
+              mimeType: 'application/pdf',
+              downloadName: 'compressed_' + file.name,
+              size: bestSize,
+              originalSize: originalSize
+            });
+          };
+          reader.readAsDataURL(bestBlob);
+        }
         
         showNotification('কাজ সম্পন্ন', 'PDF কমপ্রেস হয়েছে!');
-        alert('✅ PDF সফলভাবে কমপ্রেস হয়েছে এবং ডাউনলোড হচ্ছে!');
+        
+        if (bestMethod === 'original') {
+          alert('ℹ️ এই PDF ইতিমধ্যে সর্বোচ্চ কমপ্রেসড।\n\nমূল ফাইল ডাউনলোড হচ্ছে।');
+        } else {
+          alert('✅ PDF সফলভাবে কমপ্রেস হয়েছে এবং ডাউনলোড হচ্ছে!\n\n' + reduction.toFixed(1) + '% সাইজ কমেছে!');
+        }
       } catch (err) {
         alert('ত্রুটি: ' + err.message);
+        console.error('Compression error:', err);
       } finally {
         isProcessing = false;
-        progressBar.style.width = '100%';
         setTimeout(() => {
           progress.style.display = 'none';
           progressBar.style.width = '0%';
-        }, 2000);
+        }, 3000);
       }
     }
     
@@ -1763,6 +2201,76 @@
     
     // Initialize
     loadHistory();
+    
+    // Animated Counter Function
+    function animateCounter(elementId, start, end, duration, suffix = '') {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      
+      const range = end - start;
+      const increment = range / (duration / 16); // 60 FPS
+      let current = start;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= end) {
+          element.textContent = end.toLocaleString('bn-BD') + suffix;
+          clearInterval(timer);
+        } else {
+          element.textContent = Math.floor(current).toLocaleString('bn-BD') + suffix;
+        }
+      }, 16);
+    }
+    
+    // Start counters on page load
+    window.addEventListener('load', function() {
+      // Logo rotation
+      const logo = document.getElementById('logoElement');
+      if (logo) {
+        logo.style.animation = 'rotate360 0.6s ease-in-out';
+      }
+      
+      // Animate counters
+      animateCounter('toolsCounter', 0, 10, 2000, '+');
+      animateCounter('customersCounter', 0, 5000, 3000, '+');
+      
+      // Increment customer counter every 10 seconds
+      setInterval(() => {
+        const customerEl = document.getElementById('customersCounter');
+        if (customerEl) {
+          const currentValue = parseInt(customerEl.textContent.replace(/[^0-9]/g, ''));
+          const newValue = currentValue + Math.floor(Math.random() * 5) + 1; // Random 1-5 increase
+          customerEl.textContent = newValue.toLocaleString('bn-BD') + '+';
+        }
+      }, 10000); // Every 10 seconds
+    });
+    
+    
+    // Logo shake animation followed by fall and rise every 3 seconds
+    setInterval(function() {
+      const logo = document.getElementById('logoElement');
+      if (logo) {
+        // Only shake animation
+        logo.style.animation = 'shake 0.8s ease-in-out';
+        
+        // Reset animation
+        setTimeout(() => {
+          logo.style.animation = 'none';
+        }, 800); // shake duration
+      }
+    }, 3000); // 3 seconds
+    
+    // Function to rotate 360 degrees and reload
+    function rotateAndReload() {
+      const logo = document.getElementById('logoElement');
+      if (logo) {
+        logo.style.animation = 'rotate360 0.6s ease-in-out';
+        setTimeout(() => {
+          location.reload();
+        }, 600); // Wait for rotation to complete
+      }
+    }
+    
     
     // Reset functions for back button
     function resetImageToPDF() {
