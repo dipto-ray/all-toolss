@@ -1,18 +1,6 @@
 <!doctype html>
 <html lang="bn">
 <head>
-
-<!-- Google tag (GA4) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MQKDH7VYKQ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-MQKDH7VYKQ');
-</script>
-
-  
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title> All Pro Tools in 2026 </title>
@@ -107,6 +95,28 @@
     @media (max-width:768px){.tool-grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:480px){.tool-grid{grid-template-columns:1fr}}
     
+    /* Statistics Section Responsive */
+    #statisticsSection > div {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:40px;
+    }
+    @media (max-width:1024px){
+      #statisticsSection > div {
+        grid-template-columns:repeat(2,1fr);
+        gap:30px;
+      }
+    }
+    @media (max-width:600px){
+      #statisticsSection > div {
+        grid-template-columns:1fr;
+        gap:20px;
+      }
+      #statisticsSection {
+        padding:30px 15px !important;
+      }
+    }
+    
     /* Updated tool-card with border */
     .tool-card{
       background:var(--bg-secondary);
@@ -128,7 +138,7 @@
     .tool-card.premium::after{content:'🔒 Premium';position:absolute;top:10px;right:10px;background:#fbbf24;color:#000;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:bold;box-shadow:0 2px 8px rgba(251,191,36,0.4)}
     
     /* Tool Icon Animations */
-    .tool-icon{font-size:48px;margin-bottom:15px;text-align:center;display:block;width:100%}
+    .tool-icon{font-size:48px;margin-bottom:15px;text-align:center;display:inline-block}
     
     /* Merge animation - files coming together */
     @keyframes merge {
@@ -797,15 +807,15 @@
   </div>
 
 
-  <!-- Stats Section -->
-  <div class="stats-section">
+  <!-- Stats Section (Only on Home Page) -->
+  <div class="stats-section" id="statsSection">
     <div class="stats-container">
       <div class="stat-item">
-        <h3 id="toolsCounter">0</h3>
+        <h3>১০+</h3>
         <p>শক্তিশালী টুলস</p>
       </div>
       <div class="stat-item">
-        <h3 id="customersCounter">0</h3>
+        <h3>NaN+</h3>
         <p>সন্তুষ্ট কাস্টমার</p>
       </div>
       <div class="stat-item">
@@ -820,7 +830,7 @@
   </div>
   </div>
   
-  <footer style="background:#000000;margin-top:0;border-top:none;padding:40px 20px 20px">
+  <footer id="mainFooter" style="background:#000000;margin-top:0;border-top:none;padding:40px 20px 20px">
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;text-align:center">
       
       <!-- Contact Section -->
@@ -915,6 +925,17 @@
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
       window.scrollTo(0, 0);
+      
+      // Show footer and stats section only on home page
+      const footer = document.getElementById('mainFooter');
+      const statsSection = document.getElementById('statsSection');
+      if (pageId === 'home') {
+        if (footer) footer.style.display = 'block';
+        if (statsSection) statsSection.style.display = 'block';
+      } else {
+        if (footer) footer.style.display = 'none';
+        if (statsSection) statsSection.style.display = 'none';
+      }
     }
     
     // Theme Toggle
@@ -1454,271 +1475,125 @@
       progressBar.style.width = '0%';
       
       try {
-        const originalSize = file.size;
-        let bestBlob = null;
-        let bestSize = originalSize;
-        let bestMethod = 'original';
+        const { PDFDocument } = PDFLib;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(arrayBuffer);
         
-        // METHOD 1: Try pdf-lib compression
-        try {
-          progressBar.style.width = '15%';
-          const { PDFDocument } = PDFLib;
-          const arrayBuffer = await file.arrayBuffer();
-          const pdfDoc = await PDFDocument.load(arrayBuffer);
-          
-          const pdfBytes = await pdfDoc.save({
-            useObjectStreams: true,
-            addDefaultPage: false,
-            objectsPerTick: 50
-          });
-          
-          const blob1 = new Blob([pdfBytes], { type: 'application/pdf' });
-          if (blob1.size < bestSize) {
-            bestBlob = blob1;
-            bestSize = blob1.size;
-            bestMethod = 'pdf-lib';
+        // Get selected quality
+        const qualitySelect = document.querySelector('input[name="quality"]:checked');
+        let imageQuality = 0.5; // default medium
+        let scale = 1.0;
+        
+        if (qualitySelect) {
+          const quality = qualitySelect.value;
+          if (quality === 'low') {
+            imageQuality = 0.3;
+            scale = 0.7;
+          } else if (quality === 'medium') {
+            imageQuality = 0.5;
+            scale = 0.85;
+          } else if (quality === 'high') {
+            imageQuality = 0.7;
+            scale = 1.0;
           }
-        } catch (e) {
-          console.log('Method 1 failed:', e);
         }
         
-        // METHOD 2: Image-based compression with low quality (readable)
-        try {
-          progressBar.style.width = '35%';
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          const numPages = pdf.numPages;
-          
-          const { jsPDF } = window.jspdf;
-          const compressedPdf = new jsPDF({
-            compress: true,
-            unit: 'pt',
-            format: 'a4'
-          });
-          
-          let firstPage = true;
-          
-          for (let i = 1; i <= numPages; i++) {
-            const page = await pdf.getPage(i);
-            
-            // Better scale for readability
-            const viewport = page.getViewport({ scale: 1.0 });
-            
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d', { 
-              alpha: false,
-              willReadFrequently: false
-            });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            
-            await page.render({
-              canvasContext: context,
-              viewport: viewport,
-              intent: 'print'
-            }).promise;
-            
-            // Balanced compression - readable but compressed
-            const imgData = canvas.toDataURL('image/jpeg', 0.5);
-            
-            if (!firstPage) {
-              compressedPdf.addPage();
-            }
-            firstPage = false;
-            
-            const pageWidth = compressedPdf.internal.pageSize.getWidth();
-            const pageHeight = compressedPdf.internal.pageSize.getHeight();
-            
-            compressedPdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
-          }
-          
-          const blob2 = compressedPdf.output('blob');
-          if (blob2.size < bestSize) {
-            bestBlob = blob2;
-            bestSize = blob2.size;
-            bestMethod = 'image-balanced';
-          }
-        } catch (e) {
-          console.log('Method 2 failed:', e);
-        }
+        const numPages = pdfDoc.getPageCount();
+        progressBar.style.width = '30%';
         
-        // METHOD 3: Image-based compression with medium-low quality
-        try {
-          progressBar.style.width = '60%';
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          const numPages = pdf.numPages;
-          
-          const { jsPDF } = window.jspdf;
-          const compressedPdf = new jsPDF({
-            compress: true,
-            unit: 'pt',
-            format: 'a4'
-          });
-          
-          let firstPage = true;
-          
-          for (let i = 1; i <= numPages; i++) {
-            const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 1.2 });
-            
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d', { alpha: false });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            
-            await page.render({
-              canvasContext: context,
-              viewport: viewport
-            }).promise;
-            
-            const imgData = canvas.toDataURL('image/jpeg', 0.6);
-            
-            if (!firstPage) {
-              compressedPdf.addPage();
-            }
-            firstPage = false;
-            
-            const pageWidth = compressedPdf.internal.pageSize.getWidth();
-            const pageHeight = compressedPdf.internal.pageSize.getHeight();
-            
-            compressedPdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'MEDIUM');
-          }
-          
-          const blob3 = compressedPdf.output('blob');
-          if (blob3.size < bestSize) {
-            bestBlob = blob3;
-            bestSize = blob3.size;
-            bestMethod = 'image-medium';
-          }
-        } catch (e) {
-          console.log('Method 3 failed:', e);
-        }
+        // Create new PDF with compressed images
+        const arrayBufferOriginal = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBufferOriginal }).promise;
         
-        // METHOD 4: Image-based compression with good quality
-        try {
-          progressBar.style.width = '80%';
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          const numPages = pdf.numPages;
+        const { jsPDF } = window.jspdf;
+        const compressedPdf = new jsPDF();
+        let firstPage = true;
+        
+        for (let i = 1; i <= numPages; i++) {
+          progressBar.style.width = (30 + (i / numPages) * 60) + '%';
           
-          const { jsPDF } = window.jspdf;
-          const compressedPdf = new jsPDF({
-            compress: true,
-            unit: 'pt',
-            format: 'a4'
-          });
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: scale });
           
-          let firstPage = true;
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
           
-          for (let i = 1; i <= numPages; i++) {
-            const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 1.5 });
-            
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            
-            await page.render({
-              canvasContext: context,
-              viewport: viewport
-            }).promise;
-            
-            const imgData = canvas.toDataURL('image/jpeg', 0.7);
-            
-            if (!firstPage) {
-              compressedPdf.addPage();
-            }
-            firstPage = false;
-            
-            const pageWidth = compressedPdf.internal.pageSize.getWidth();
-            const pageHeight = compressedPdf.internal.pageSize.getHeight();
-            
-            compressedPdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'SLOW');
+          await page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+          
+          // Convert to JPEG with compression
+          const imgData = canvas.toDataURL('image/jpeg', imageQuality);
+          
+          if (!firstPage) {
+            compressedPdf.addPage();
           }
+          firstPage = false;
           
-          const blob4 = compressedPdf.output('blob');
-          if (blob4.size < bestSize) {
-            bestBlob = blob4;
-            bestSize = blob4.size;
-            bestMethod = 'image-good';
-          }
-        } catch (e) {
-          console.log('Method 4 failed:', e);
+          // Calculate aspect ratio to fit A4
+          const imgWidth = 210; // A4 width in mm
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          
+          compressedPdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
         }
         
         progressBar.style.width = '95%';
         
-        // If no method worked or size increased, use original file
-        if (!bestBlob || bestSize >= originalSize) {
-          bestBlob = file;
-          bestSize = originalSize;
-          bestMethod = 'original';
-        }
+        const compressedBlob = compressedPdf.output('blob');
         
         progressBar.style.width = '100%';
         
-        const reduction = ((originalSize - bestSize) / originalSize) * 100;
-        
-        // Show results
-        if (bestMethod === 'original') {
-          sizeInfo.style.display = 'block';
-          sizeInfo.innerHTML = `<strong>ℹ️ তথ্য</strong><br>
-                                <strong>মূল সাইজ:</strong> ${(originalSize / 1024).toFixed(2)} KB<br>
-                                <strong>ফলাফল:</strong> এই PDF ইতিমধ্যে সর্বোচ্চ কমপ্রেসড। মূল ফাইল ডাউনলোড হচ্ছে।<br>
-                                <em style="color:#f59e0b">কোন compression method সাইজ কমাতে পারেনি</em>`;
-        } else {
-          sizeInfo.style.display = 'block';
-          const emoji = reduction >= 70 ? '🎉' : reduction >= 50 ? '✅' : '✔️';
-          sizeInfo.innerHTML = `<strong>${emoji} সফল!</strong><br>
-                                <strong>মূল সাইজ:</strong> ${(originalSize / 1024).toFixed(2)} KB<br>
-                                <strong>কমপ্রেসড সাইজ:</strong> ${(bestSize / 1024).toFixed(2)} KB<br>
-                                <strong>সাশ্রয়:</strong> ${reduction.toFixed(1)}%<br>
-                                <em style="color:#059669">Method: ${bestMethod}</em>`;
+        // Check if compression actually reduced size
+        if (compressedBlob.size >= file.size) {
+          alert('⚠️ এই PDF ইতিমধ্যে অপ্টিমাইজড। আরো কমপ্রেস করা সম্ভব নয়।\n\nমূল সাইজ: ' + (file.size / 1024).toFixed(2) + ' KB\nকমপ্রেসড সাইজ: ' + (compressedBlob.size / 1024).toFixed(2) + ' KB');
+          isProcessing = false;
+          progress.style.display = 'none';
+          return;
         }
         
-        // Download the best result
-        const url = URL.createObjectURL(bestBlob);
+        // Download compressed PDF
+        const url = URL.createObjectURL(compressedBlob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = bestMethod === 'original' ? file.name : 'compressed_' + file.name;
+        link.download = 'compressed_' + file.name;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
         
-        // Save to history only if compressed
-        if (bestMethod !== 'original') {
-          const reader = new FileReader();
-          reader.onload = () => {
-            saveToHistory('PDF কমপ্রেস', 'compressed_' + file.name, {
-              base64: reader.result.split(',')[1],
-              mimeType: 'application/pdf',
-              downloadName: 'compressed_' + file.name,
-              size: bestSize,
-              originalSize: originalSize
-            });
-          };
-          reader.readAsDataURL(bestBlob);
-        }
+        const reduction = ((file.size - compressedBlob.size) / file.size) * 100;
+        
+        sizeInfo.style.display = 'block';
+        sizeInfo.innerHTML = `<strong>✅ সফল!</strong><br>
+                              <strong>মূল সাইজ:</strong> ${(file.size / 1024).toFixed(2)} KB<br>
+                              <strong>কমপ্রেসড সাইজ:</strong> ${(compressedBlob.size / 1024).toFixed(2)} KB<br>
+                              <strong>সাশ্রয়:</strong> ${reduction.toFixed(1)}%`;
+        
+        const reader = new FileReader();
+        reader.onload = () => {
+          saveToHistory('PDF কমপ্রেস', 'compressed_' + file.name, {
+            base64: reader.result.split(',')[1],
+            mimeType: 'application/pdf',
+            downloadName: 'compressed_' + file.name,
+            size: compressedBlob.size,
+            originalSize: file.size
+          });
+        };
+        reader.readAsDataURL(compressedBlob);
         
         showNotification('কাজ সম্পন্ন', 'PDF কমপ্রেস হয়েছে!');
-        
-        if (bestMethod === 'original') {
-          alert('ℹ️ এই PDF ইতিমধ্যে সর্বোচ্চ কমপ্রেসড।\n\nমূল ফাইল ডাউনলোড হচ্ছে।');
-        } else {
-          alert('✅ PDF সফলভাবে কমপ্রেস হয়েছে এবং ডাউনলোড হচ্ছে!\n\n' + reduction.toFixed(1) + '% সাইজ কমেছে!');
-        }
+        alert('✅ PDF সফলভাবে কমপ্রেস হয়েছে এবং ডাউনলোড হচ্ছে!\n\n' + reduction.toFixed(1) + '% সাইজ কমেছে!');
       } catch (err) {
         alert('ত্রুটি: ' + err.message);
-        console.error('Compression error:', err);
       } finally {
         isProcessing = false;
         setTimeout(() => {
           progress.style.display = 'none';
           progressBar.style.width = '0%';
-        }, 3000);
+        }, 2000);
       }
     }
     
@@ -2321,5 +2196,3 @@
   </script>
 </body>
 </html>
-
-
